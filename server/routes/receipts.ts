@@ -131,15 +131,15 @@ export const list = forge
   .callback(async ({ db, query, response }) => {
     const conditions = []
 
-    if (query?.status) {
+    if (query.status) {
       conditions.push(eq(invoiceMakerReceipts.status, query.status))
     }
 
-    if (query?.clientId) {
+    if (query.clientId) {
       conditions.push(eq(invoiceMakerReceipts.bill_to, query.clientId))
     }
 
-    if (query?.search) {
+    if (query.search) {
       conditions.push(
         or(
           ilike(invoiceMakerReceipts.receipt_number, `%${query.search}%`),
@@ -280,6 +280,10 @@ export const create = forge
       })
       .returning()
 
+    if (!receipt) {
+      return response.badRequest('Failed to create receipt')
+    }
+
     if (items && items.length > 0) {
       await db.insert(invoiceMakerReceiptItems).values(
         items.map(item => ({
@@ -381,9 +385,7 @@ export const remove = forge
     }
   })
   .callback(async ({ db, query: { id }, response }) => {
-    await db
-      .delete(invoiceMakerReceipts)
-      .where(eq(invoiceMakerReceipts.id, id))
+    await db.delete(invoiceMakerReceipts).where(eq(invoiceMakerReceipts.id, id))
 
     return response.noContent()
   })
@@ -445,6 +447,10 @@ export const duplicate = forge
         amount_paid: 0
       })
       .returning()
+
+    if (!newReceipt) {
+      return response.badRequest('Failed to create receipt')
+    }
 
     if (originalItems.length > 0) {
       await db.insert(invoiceMakerReceiptItems).values(

@@ -51,6 +51,10 @@ export const create = forge
   .callback(async ({ db, body, response }) => {
     const [created] = await db.insert(invoiceMakerItems).values(body).returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create item')
+    }
+
     return response.created(created)
   })
 
@@ -73,6 +77,10 @@ export const update = forge
       .set(body)
       .where(eq(invoiceMakerItems.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(updated)
   })

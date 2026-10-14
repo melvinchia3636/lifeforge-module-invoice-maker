@@ -66,6 +66,10 @@ export const get = forge
       .values(DEFAULT_SETTINGS)
       .returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create settings')
+    }
+
     return response.ok(created)
   })
 
@@ -104,6 +108,10 @@ export const update = forge
           .values({ ...DEFAULT_SETTINGS, ...body, ...logoUpdate })
           .returning()
 
+        if (!created) {
+          return response.badRequest('Failed to create settings')
+        }
+
         return response.ok(created)
       }
 
@@ -112,6 +120,10 @@ export const update = forge
         .set({ ...body, ...logoUpdate, updated: new Date() })
         .where(eq(invoiceMakerSettings.id, existing.id))
         .returning()
+
+      if (!updated) {
+        return response.notFound()
+      }
 
       return response.ok(updated)
     }

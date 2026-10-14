@@ -53,9 +53,7 @@ const invoiceBodyFields = {
   bill_to: z.string().optional(),
   payment_terms: z.string().optional(),
   po_number: z.string().optional(),
-  status: z
-    .enum(['draft', 'sent', 'paid', 'overdue', 'cancelled'])
-    .optional(),
+  status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
   shipping_address: z.string().optional(),
   tax_type: z.enum(['rate', 'fixed']).optional(),
   tax_amount: z.number().optional(),
@@ -135,15 +133,15 @@ export const list = forge
   .callback(async ({ db, query, response }) => {
     const conditions = []
 
-    if (query?.status) {
+    if (query.status) {
       conditions.push(eq(invoiceMakerInvoices.status, query.status))
     }
 
-    if (query?.clientId) {
+    if (query.clientId) {
       conditions.push(eq(invoiceMakerInvoices.bill_to, query.clientId))
     }
 
-    if (query?.search) {
+    if (query.search) {
       conditions.push(
         or(
           ilike(invoiceMakerInvoices.invoice_number, `%${query.search}%`),
@@ -160,7 +158,10 @@ export const list = forge
         eq(invoiceMakerInvoices.bill_to, invoiceMakerClients.id)
       )
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(desc(invoiceMakerInvoices.date), desc(invoiceMakerInvoices.created))
+      .orderBy(
+        desc(invoiceMakerInvoices.date),
+        desc(invoiceMakerInvoices.created)
+      )
 
     const aggregates = await db
       .select({
@@ -280,6 +281,10 @@ export const create = forge
         notes: invoiceData.notes ?? ''
       })
       .returning()
+
+    if (!invoice) {
+      return response.badRequest('Failed to create invoice')
+    }
 
     if (items && items.length > 0) {
       await db.insert(invoiceMakerItems).values(
@@ -446,6 +451,10 @@ export const duplicate = forge
         notes: original.notes
       })
       .returning()
+
+    if (!newInvoice) {
+      return response.badRequest('Failed to create invoice')
+    }
 
     if (originalItems.length > 0) {
       await db.insert(invoiceMakerItems).values(

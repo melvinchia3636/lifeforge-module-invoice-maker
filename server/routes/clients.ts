@@ -64,6 +64,10 @@ export const create = forge
       .values(body)
       .returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create client')
+    }
+
     return response.created(created)
   })
 
@@ -86,6 +90,10 @@ export const update = forge
       .set({ ...body, updated: new Date() })
       .where(eq(invoiceMakerClients.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(updated)
   })

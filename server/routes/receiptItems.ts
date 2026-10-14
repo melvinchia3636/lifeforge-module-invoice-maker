@@ -57,6 +57,10 @@ export const create = forge
       .values(body)
       .returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create receipt item')
+    }
+
     return response.created(created)
   })
 
@@ -79,6 +83,10 @@ export const update = forge
       .set(body)
       .where(eq(invoiceMakerReceiptItems.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(updated)
   })
