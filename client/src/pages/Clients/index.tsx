@@ -63,7 +63,7 @@ function Clients() {
                   onClick: handleCreate,
                   tProps: { item: t('items.client') }
                 }}
-                icon="tabler:users-off"
+                icon="tabler:user-off"
                 message={{
                   id: 'clients'
                 }}
