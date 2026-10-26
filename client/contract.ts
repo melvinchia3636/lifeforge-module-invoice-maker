@@ -1,3250 +1,922 @@
-export const contract = {
-  "invoices": {
-    "create": {
-      "method": "post",
-      "description": "Create a new invoice",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "bill_to": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "po_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "tax_amount": {
-              "type": "number"
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "discount_amount": {
-              "type": "number"
-            },
-            "shipping_amount": {
-              "type": "number"
-            },
-            "amount_paid": {
-              "type": "number"
-            },
-            "notes": {
-              "type": "string"
-            },
-            "date": {
-              "type": "string"
-            },
-            "due_date": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number"
-                  },
-                  "rate": {
-                    "type": "number"
-                  },
-                  "order": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "date",
-            "due_date"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "invoice_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "due_date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "po_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "notes": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "invoice_number",
-            "bill_to",
-            "date",
-            "due_date",
-            "payment_terms",
-            "po_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "notes",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "duplicate": {
-      "method": "post",
-      "description": "Duplicate an existing invoice",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "null"
-        }
-      }
-    },
-    "getById": {
-      "method": "get",
-      "description": "Get invoice by ID with items",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "invoice_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "due_date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "po_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "notes": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "invoice": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number",
-                    "minimum": -140737488355328,
-                    "maximum": 140737488355327
-                  },
-                  "rate": {
-                    "type": "number",
-                    "minimum": -140737488355328,
-                    "maximum": 140737488355327
-                  },
-                  "order": {
-                    "type": "integer",
-                    "minimum": -2147483648,
-                    "maximum": 2147483647
-                  }
-                },
-                "required": [
-                  "id",
-                  "invoice",
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "expand": {
-              "type": "object",
-              "properties": {
-                "bill_to": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "address": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "phone": {
-                      "type": "string"
-                    },
-                    "created": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "updated": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "name",
-                    "address",
-                    "email",
-                    "phone",
-                    "created",
-                    "updated"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "required": [
-            "id",
-            "invoice_number",
-            "bill_to",
-            "date",
-            "due_date",
-            "payment_terms",
-            "po_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "notes",
-            "created",
-            "updated",
-            "items"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "List all invoices",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "clientId": {
-              "type": "string"
-            },
-            "search": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "invoice_number": {
-                "type": "string"
-              },
-              "bill_to": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "date": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "due_date": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "payment_terms": {
-                "type": "string"
-              },
-              "po_number": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "draft",
-                  "sent",
-                  "paid",
-                  "overdue",
-                  "cancelled"
-                ]
-              },
-              "shipping_address": {
-                "type": "string"
-              },
-              "tax_type": {
-                "type": "string",
-                "enum": [
-                  "rate",
-                  "fixed",
-                  ""
-                ]
-              },
-              "tax_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "discount_type": {
-                "type": "string",
-                "enum": [
-                  "rate",
-                  "fixed",
-                  ""
-                ]
-              },
-              "discount_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "shipping_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "amount_paid": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "notes": {
-                "type": "string"
-              },
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "updated": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "subtotal": {
-                "type": "number"
-              },
-              "item_count": {
-                "type": "number"
-              },
-              "calculated_tax": {
-                "type": "number"
-              },
-              "calculated_discount": {
-                "type": "number"
-              },
-              "calculated_shipping": {
-                "type": "number"
-              },
-              "expand": {
-                "type": "object",
-                "properties": {
-                  "bill_to": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "address": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      },
-                      "phone": {
-                        "type": "string"
-                      },
-                      "created": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "updated": {
-                        "type": "string",
-                        "format": "date-time"
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "name",
-                      "address",
-                      "email",
-                      "phone",
-                      "created",
-                      "updated"
-                    ],
-                    "additionalProperties": false
-                  }
-                },
-                "additionalProperties": false
-              }
-            },
-            "required": [
-              "id",
-              "invoice_number",
-              "bill_to",
-              "date",
-              "due_date",
-              "payment_terms",
-              "po_number",
-              "status",
-              "shipping_address",
-              "tax_type",
-              "tax_amount",
-              "discount_type",
-              "discount_amount",
-              "shipping_amount",
-              "amount_paid",
-              "notes",
-              "created",
-              "updated",
-              "subtotal",
-              "item_count",
-              "calculated_tax",
-              "calculated_discount",
-              "calculated_shipping"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete an invoice",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing invoice",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "bill_to": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "po_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "tax_amount": {
-              "type": "number"
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "discount_amount": {
-              "type": "number"
-            },
-            "shipping_amount": {
-              "type": "number"
-            },
-            "amount_paid": {
-              "type": "number"
-            },
-            "notes": {
-              "type": "string"
-            },
-            "invoice_number": {
-              "type": "string"
-            },
-            "date": {
-              "type": "string"
-            },
-            "due_date": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number"
-                  },
-                  "rate": {
-                    "type": "number"
-                  },
-                  "order": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "invoice_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "due_date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "po_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "sent",
-                "paid",
-                "overdue",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "notes": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "invoice_number",
-            "bill_to",
-            "date",
-            "due_date",
-            "payment_terms",
-            "po_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "notes",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  "items": {
-    "create": {
-      "method": "post",
-      "description": "Create a new line item",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "order": {
-              "type": "number"
-            },
-            "invoice": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "description",
-            "quantity",
-            "rate",
-            "order",
-            "invoice"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "invoice": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "order": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            }
-          },
-          "required": [
-            "id",
-            "invoice",
-            "description",
-            "quantity",
-            "rate",
-            "order"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "listByInvoice": {
-      "method": "get",
-      "description": "List all items for an invoice",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "invoiceId": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "invoiceId"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "invoice": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "description": {
-                "type": "string"
-              },
-              "quantity": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "rate": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "order": {
-                "type": "integer",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              }
-            },
-            "required": [
-              "id",
-              "invoice",
-              "description",
-              "quantity",
-              "rate",
-              "order"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a line item",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "reorder": {
-      "method": "post",
-      "description": "Reorder line items",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "invoiceId": {
-              "type": "string"
-            },
-            "itemIds": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": [
-            "invoiceId",
-            "itemIds"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "success"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing line item",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "order": {
-              "type": "number"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "invoice": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "order": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            }
-          },
-          "required": [
-            "id",
-            "invoice",
-            "description",
-            "quantity",
-            "rate",
-            "order"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  "receipts": {
-    "create": {
-      "method": "post",
-      "description": "Create a new receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "bill_to": {
-              "type": "string"
-            },
-            "payment_method": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "reference_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "tax_amount": {
-              "type": "number"
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "discount_amount": {
-              "type": "number"
-            },
-            "shipping_amount": {
-              "type": "number"
-            },
-            "amount_paid": {
-              "type": "number"
-            },
-            "date": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number"
-                  },
-                  "rate": {
-                    "type": "number"
-                  },
-                  "order": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "date"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "receipt_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_method": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "reference_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "receipt_number",
-            "bill_to",
-            "date",
-            "payment_method",
-            "payment_terms",
-            "reference_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "duplicate": {
-      "method": "post",
-      "description": "Duplicate an existing receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "null"
-        }
-      }
-    },
-    "getById": {
-      "method": "get",
-      "description": "Get receipt by ID with items",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "receipt_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_method": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "reference_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "receipt": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number",
-                    "minimum": -140737488355328,
-                    "maximum": 140737488355327
-                  },
-                  "rate": {
-                    "type": "number",
-                    "minimum": -140737488355328,
-                    "maximum": 140737488355327
-                  },
-                  "order": {
-                    "type": "integer",
-                    "minimum": -2147483648,
-                    "maximum": 2147483647
-                  }
-                },
-                "required": [
-                  "id",
-                  "receipt",
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "expand": {
-              "type": "object",
-              "properties": {
-                "bill_to": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "address": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "phone": {
-                      "type": "string"
-                    },
-                    "created": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "updated": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "name",
-                    "address",
-                    "email",
-                    "phone",
-                    "created",
-                    "updated"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "required": [
-            "id",
-            "receipt_number",
-            "bill_to",
-            "date",
-            "payment_method",
-            "payment_terms",
-            "reference_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "created",
-            "updated",
-            "items"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "List all receipts",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "clientId": {
-              "type": "string"
-            },
-            "search": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "receipt_number": {
-                "type": "string"
-              },
-              "bill_to": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "date": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "payment_method": {
-                "type": "string"
-              },
-              "payment_terms": {
-                "type": "string"
-              },
-              "reference_number": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "draft",
-                  "issued",
-                  "cancelled"
-                ]
-              },
-              "shipping_address": {
-                "type": "string"
-              },
-              "tax_type": {
-                "type": "string",
-                "enum": [
-                  "rate",
-                  "fixed",
-                  ""
-                ]
-              },
-              "tax_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "discount_type": {
-                "type": "string",
-                "enum": [
-                  "rate",
-                  "fixed",
-                  ""
-                ]
-              },
-              "discount_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "shipping_amount": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "amount_paid": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "updated": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "subtotal": {
-                "type": "number"
-              },
-              "item_count": {
-                "type": "number"
-              },
-              "calculated_tax": {
-                "type": "number"
-              },
-              "calculated_discount": {
-                "type": "number"
-              },
-              "calculated_shipping": {
-                "type": "number"
-              },
-              "expand": {
-                "type": "object",
-                "properties": {
-                  "bill_to": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "address": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      },
-                      "phone": {
-                        "type": "string"
-                      },
-                      "created": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "updated": {
-                        "type": "string",
-                        "format": "date-time"
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "name",
-                      "address",
-                      "email",
-                      "phone",
-                      "created",
-                      "updated"
-                    ],
-                    "additionalProperties": false
-                  }
-                },
-                "additionalProperties": false
-              }
-            },
-            "required": [
-              "id",
-              "receipt_number",
-              "bill_to",
-              "date",
-              "payment_method",
-              "payment_terms",
-              "reference_number",
-              "status",
-              "shipping_address",
-              "tax_type",
-              "tax_amount",
-              "discount_type",
-              "discount_amount",
-              "shipping_amount",
-              "amount_paid",
-              "created",
-              "updated",
-              "subtotal",
-              "item_count",
-              "calculated_tax",
-              "calculated_discount",
-              "calculated_shipping"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "bill_to": {
-              "type": "string"
-            },
-            "payment_method": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "reference_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "tax_amount": {
-              "type": "number"
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed"
-              ]
-            },
-            "discount_amount": {
-              "type": "number"
-            },
-            "shipping_amount": {
-              "type": "number"
-            },
-            "amount_paid": {
-              "type": "number"
-            },
-            "receipt_number": {
-              "type": "string"
-            },
-            "date": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number"
-                  },
-                  "rate": {
-                    "type": "number"
-                  },
-                  "order": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "description",
-                  "quantity",
-                  "rate",
-                  "order"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "receipt_number": {
-              "type": "string"
-            },
-            "bill_to": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "date": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "payment_method": {
-              "type": "string"
-            },
-            "payment_terms": {
-              "type": "string"
-            },
-            "reference_number": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "draft",
-                "issued",
-                "cancelled"
-              ]
-            },
-            "shipping_address": {
-              "type": "string"
-            },
-            "tax_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "tax_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "discount_type": {
-              "type": "string",
-              "enum": [
-                "rate",
-                "fixed",
-                ""
-              ]
-            },
-            "discount_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "shipping_amount": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "amount_paid": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "receipt_number",
-            "bill_to",
-            "date",
-            "payment_method",
-            "payment_terms",
-            "reference_number",
-            "status",
-            "shipping_address",
-            "tax_type",
-            "tax_amount",
-            "discount_type",
-            "discount_amount",
-            "shipping_amount",
-            "amount_paid",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  "receiptItems": {
-    "create": {
-      "method": "post",
-      "description": "Create a new line item for a receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "order": {
-              "type": "number"
-            },
-            "receipt": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "description",
-            "quantity",
-            "rate",
-            "order",
-            "receipt"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "receipt": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "order": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            }
-          },
-          "required": [
-            "id",
-            "receipt",
-            "description",
-            "quantity",
-            "rate",
-            "order"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "listByReceipt": {
-      "method": "get",
-      "description": "List all items for a receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "receiptId": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "receiptId"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "receipt": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "description": {
-                "type": "string"
-              },
-              "quantity": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "rate": {
-                "type": "number",
-                "minimum": -140737488355328,
-                "maximum": 140737488355327
-              },
-              "order": {
-                "type": "integer",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              }
-            },
-            "required": [
-              "id",
-              "receipt",
-              "description",
-              "quantity",
-              "rate",
-              "order"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a line item from a receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "reorder": {
-      "method": "post",
-      "description": "Reorder receipt line items",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "receiptId": {
-              "type": "string"
-            },
-            "itemIds": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": [
-            "receiptId",
-            "itemIds"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "success"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing line item for a receipt",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "order": {
-              "type": "number"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "receipt": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "description": {
-              "type": "string"
-            },
-            "quantity": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "order": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            }
-          },
-          "required": [
-            "id",
-            "receipt",
-            "description",
-            "quantity",
-            "rate",
-            "order"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  "clients": {
-    "create": {
-      "method": "post",
-      "description": "Create a new client",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "address": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "address",
-            "email",
-            "phone"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "address": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "address",
-            "email",
-            "phone",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "getById": {
-      "method": "get",
-      "description": "Get client by ID",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "address": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "address",
-            "email",
-            "phone",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "List all clients",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {},
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "name": {
-                "type": "string"
-              },
-              "address": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
-              },
-              "phone": {
-                "type": "string"
-              },
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "updated": {
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "address",
-              "email",
-              "phone",
-              "created",
-              "updated"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a client",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing client",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "address": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "address",
-            "email",
-            "phone"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "address": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "address",
-            "email",
-            "phone",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  "settings": {
-    "get": {
-      "method": "get",
-      "description": "Get invoice maker settings",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {},
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "company_name": {
-              "type": "string"
-            },
-            "company_address": {
-              "type": "string"
-            },
-            "company_reg_no": {
-              "type": "string"
-            },
-            "company_email": {
-              "type": "string"
-            },
-            "company_tel_no": {
-              "type": "string"
-            },
-            "default_logo": {
-              "type": "string"
-            },
-            "default_payment_terms": {
-              "type": "string"
-            },
-            "default_notes": {
-              "type": "string"
-            },
-            "default_tax_rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "bank_name": {
-              "type": "string"
-            },
-            "bank_account": {
-              "type": "string"
-            },
-            "bank_account_name": {
-              "type": "string"
-            },
-            "currency": {
-              "type": "string"
-            },
-            "currency_symbol": {
-              "type": "string"
-            },
-            "invoice_prefix": {
-              "type": "string"
-            },
-            "next_invoice_number": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            },
-            "receipt_prefix": {
-              "type": "string"
-            },
-            "next_receipt_number": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "company_name",
-            "company_address",
-            "company_reg_no",
-            "company_email",
-            "company_tel_no",
-            "default_logo",
-            "default_payment_terms",
-            "default_notes",
-            "default_tax_rate",
-            "bank_name",
-            "bank_account",
-            "bank_account_name",
-            "currency",
-            "currency_symbol",
-            "invoice_prefix",
-            "next_invoice_number",
-            "receipt_prefix",
-            "next_receipt_number",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update invoice maker settings",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": {
-        "default_logo": {
-          "optional": true
-        }
-      },
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "company_name": {
-              "type": "string"
-            },
-            "company_address": {
-              "type": "string"
-            },
-            "company_reg_no": {
-              "type": "string"
-            },
-            "company_email": {
-              "type": "string"
-            },
-            "company_tel_no": {
-              "type": "string"
-            },
-            "default_payment_terms": {
-              "type": "string"
-            },
-            "default_notes": {
-              "type": "string"
-            },
-            "default_tax_rate": {
-              "type": "number"
-            },
-            "bank_name": {
-              "type": "string"
-            },
-            "bank_account": {
-              "type": "string"
-            },
-            "bank_account_name": {
-              "type": "string"
-            },
-            "currency": {
-              "type": "string"
-            },
-            "currency_symbol": {
-              "type": "string"
-            },
-            "invoice_prefix": {
-              "type": "string"
-            },
-            "next_invoice_number": {
-              "type": "number"
-            },
-            "receipt_prefix": {
-              "type": "string"
-            },
-            "next_receipt_number": {
-              "type": "number"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "company_name": {
-              "type": "string"
-            },
-            "company_address": {
-              "type": "string"
-            },
-            "company_reg_no": {
-              "type": "string"
-            },
-            "company_email": {
-              "type": "string"
-            },
-            "company_tel_no": {
-              "type": "string"
-            },
-            "default_logo": {
-              "type": "string"
-            },
-            "default_payment_terms": {
-              "type": "string"
-            },
-            "default_notes": {
-              "type": "string"
-            },
-            "default_tax_rate": {
-              "type": "number",
-              "minimum": -140737488355328,
-              "maximum": 140737488355327
-            },
-            "bank_name": {
-              "type": "string"
-            },
-            "bank_account": {
-              "type": "string"
-            },
-            "bank_account_name": {
-              "type": "string"
-            },
-            "currency": {
-              "type": "string"
-            },
-            "currency_symbol": {
-              "type": "string"
-            },
-            "invoice_prefix": {
-              "type": "string"
-            },
-            "next_invoice_number": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            },
-            "receipt_prefix": {
-              "type": "string"
-            },
-            "next_receipt_number": {
-              "type": "integer",
-              "minimum": -2147483648,
-              "maximum": 2147483647
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "company_name",
-            "company_address",
-            "company_reg_no",
-            "company_email",
-            "company_tel_no",
-            "default_logo",
-            "default_payment_terms",
-            "default_notes",
-            "default_tax_rate",
-            "bank_name",
-            "bank_account",
-            "bank_account_name",
-            "currency",
-            "currency_symbol",
-            "invoice_prefix",
-            "next_invoice_number",
-            "receipt_prefix",
-            "next_receipt_number",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    }
-  }
-} as const
+export type EndpointInvoicesDuplicate_OutputCREATED = null;
+export type EndpointInvoicesList_OutputOK = {
+  id: string;
+  invoice_number: string;
+  bill_to: string | null;
+  date: string;
+  due_date: string;
+  payment_terms: string;
+  po_number: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  notes: string;
+  created: string;
+  updated: string;
+  subtotal: number;
+  item_count: number;
+  calculated_tax: number;
+  calculated_discount: number;
+  calculated_shipping: number;
+  expand?: {
+    bill_to?: {
+      id: string;
+      name: string;
+      address: string;
+      email: string;
+      phone: string;
+      created: string;
+      updated: string;
+    };
+  };
+}[];
+export type EndpointInvoicesRemove_OutputNO_CONTENT = void;
+export type EndpointItemsListByInvoice_OutputOK = {
+  id: string;
+  invoice: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}[];
+export type EndpointItemsRemove_OutputNO_CONTENT = void;
+export type EndpointReceiptsDuplicate_OutputCREATED = null;
+export type EndpointReceiptsList_OutputOK = {
+  id: string;
+  receipt_number: string;
+  bill_to: string | null;
+  date: string;
+  payment_method: string;
+  payment_terms: string;
+  reference_number: string;
+  status: "draft" | "issued" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  created: string;
+  updated: string;
+  subtotal: number;
+  item_count: number;
+  calculated_tax: number;
+  calculated_discount: number;
+  calculated_shipping: number;
+  expand?: {
+    bill_to?: {
+      id: string;
+      name: string;
+      address: string;
+      email: string;
+      phone: string;
+      created: string;
+      updated: string;
+    };
+  };
+}[];
+export type EndpointReceiptsRemove_OutputNO_CONTENT = void;
+export type EndpointReceiptItemsListByReceipt_OutputOK = {
+  id: string;
+  receipt: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}[];
+export type EndpointReceiptItemsRemove_OutputNO_CONTENT = void;
+export type EndpointClientsList_OutputOK = {
+  id: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  created: string;
+  updated: string;
+}[];
+export type EndpointClientsRemove_OutputNO_CONTENT = void;
 
-export default contract
+export interface Contract {
+  invoices: {
+    create: EndpointInvoicesCreate;
+    duplicate: EndpointInvoicesDuplicate;
+    getById: EndpointInvoicesGetById;
+    list: EndpointInvoicesList;
+    remove: EndpointInvoicesRemove;
+    update: EndpointInvoicesUpdate;
+  };
+  items: {
+    create: EndpointItemsCreate;
+    listByInvoice: EndpointItemsListByInvoice;
+    remove: EndpointItemsRemove;
+    reorder: EndpointItemsReorder;
+    update: EndpointItemsUpdate;
+  };
+  receipts: {
+    create: EndpointReceiptsCreate;
+    duplicate: EndpointReceiptsDuplicate;
+    getById: EndpointReceiptsGetById;
+    list: EndpointReceiptsList;
+    remove: EndpointReceiptsRemove;
+    update: EndpointReceiptsUpdate;
+  };
+  receiptItems: {
+    create: EndpointReceiptItemsCreate;
+    listByReceipt: EndpointReceiptItemsListByReceipt;
+    remove: EndpointReceiptItemsRemove;
+    reorder: EndpointReceiptItemsReorder;
+    update: EndpointReceiptItemsUpdate;
+  };
+  clients: {
+    create: EndpointClientsCreate;
+    getById: EndpointClientsGetById;
+    list: EndpointClientsList;
+    remove: EndpointClientsRemove;
+    update: EndpointClientsUpdate;
+  };
+  settings: {
+    get: EndpointSettingsGet;
+    update: EndpointSettingsUpdate;
+  };
+}
+export interface EndpointInvoicesCreate {
+  method: "post";
+  input: {
+    body?: EndpointInvoicesCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointInvoicesCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointInvoicesCreate_InputBody {
+  bill_to?: string;
+  payment_terms?: string;
+  po_number?: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address?: string;
+  tax_type?: "rate" | "fixed";
+  tax_amount?: number;
+  discount_type?: "rate" | "fixed";
+  discount_amount?: number;
+  shipping_amount?: number;
+  amount_paid?: number;
+  notes?: string;
+  date: string;
+  due_date: string;
+  items?: {
+    id?: string;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+}
+export interface EndpointInvoicesCreate_OutputCREATED {
+  id: string;
+  invoice_number: string;
+  bill_to: string | null;
+  date: string;
+  due_date: string;
+  payment_terms: string;
+  po_number: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  notes: string;
+  created: string;
+  updated: string;
+}
+export interface EndpointInvoicesDuplicate {
+  method: "post";
+  input: {
+    query?: EndpointInvoicesDuplicate_InputQuery;
+  };
+  output: {
+    CREATED: EndpointInvoicesDuplicate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointInvoicesDuplicate_InputQuery {
+  id: string;
+}
+export interface EndpointInvoicesGetById {
+  method: "get";
+  input: {
+    query?: EndpointInvoicesGetById_InputQuery;
+  };
+  output: {
+    OK: EndpointInvoicesGetById_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointInvoicesGetById_InputQuery {
+  id: string;
+}
+export interface EndpointInvoicesGetById_OutputOK {
+  id: string;
+  invoice_number: string;
+  bill_to: string | null;
+  date: string;
+  due_date: string;
+  payment_terms: string;
+  po_number: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  notes: string;
+  created: string;
+  updated: string;
+  items: {
+    id: string;
+    invoice: string | null;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+  expand?: {
+    bill_to?: {
+      id: string;
+      name: string;
+      address: string;
+      email: string;
+      phone: string;
+      created: string;
+      updated: string;
+    };
+  };
+}
+export interface EndpointInvoicesList {
+  method: "get";
+  input: {
+    query?: EndpointInvoicesList_InputQuery;
+  };
+  output: {
+    OK: EndpointInvoicesList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointInvoicesList_InputQuery {
+  status?: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  clientId?: string;
+  search?: string;
+}
+export interface EndpointInvoicesRemove {
+  method: "post";
+  input: {
+    query?: EndpointInvoicesRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointInvoicesRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointInvoicesRemove_InputQuery {
+  id: string;
+}
+export interface EndpointInvoicesUpdate {
+  method: "post";
+  input: {
+    query?: EndpointInvoicesUpdate_InputQuery;
+    body?: EndpointInvoicesUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointInvoicesUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointInvoicesUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointInvoicesUpdate_InputBody {
+  bill_to?: string;
+  payment_terms?: string;
+  po_number?: string;
+  status?: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address?: string;
+  tax_type?: "rate" | "fixed";
+  tax_amount?: number;
+  discount_type?: "rate" | "fixed";
+  discount_amount?: number;
+  shipping_amount?: number;
+  amount_paid?: number;
+  notes?: string;
+  invoice_number?: string;
+  date?: string;
+  due_date?: string;
+  items?: {
+    id?: string;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+}
+export interface EndpointInvoicesUpdate_OutputOK {
+  id: string;
+  invoice_number: string;
+  bill_to: string | null;
+  date: string;
+  due_date: string;
+  payment_terms: string;
+  po_number: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  notes: string;
+  created: string;
+  updated: string;
+}
+export interface EndpointItemsCreate {
+  method: "post";
+  input: {
+    body?: EndpointItemsCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointItemsCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointItemsCreate_InputBody {
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+  invoice: string;
+}
+export interface EndpointItemsCreate_OutputCREATED {
+  id: string;
+  invoice: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}
+export interface EndpointItemsListByInvoice {
+  method: "get";
+  input: {
+    query?: EndpointItemsListByInvoice_InputQuery;
+  };
+  output: {
+    OK: EndpointItemsListByInvoice_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointItemsListByInvoice_InputQuery {
+  invoiceId: string;
+}
+export interface EndpointItemsRemove {
+  method: "post";
+  input: {
+    query?: EndpointItemsRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointItemsRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointItemsRemove_InputQuery {
+  id: string;
+}
+export interface EndpointItemsReorder {
+  method: "post";
+  input: {
+    body?: EndpointItemsReorder_InputBody;
+  };
+  output: {
+    OK: EndpointItemsReorder_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointItemsReorder_InputBody {
+  invoiceId: string;
+  itemIds: string[];
+}
+export interface EndpointItemsReorder_OutputOK {
+  success: boolean;
+}
+export interface EndpointItemsUpdate {
+  method: "post";
+  input: {
+    query?: EndpointItemsUpdate_InputQuery;
+    body?: EndpointItemsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointItemsUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointItemsUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointItemsUpdate_InputBody {
+  description?: string;
+  quantity?: number;
+  rate?: number;
+  order?: number;
+}
+export interface EndpointItemsUpdate_OutputOK {
+  id: string;
+  invoice: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}
+export interface EndpointReceiptsCreate {
+  method: "post";
+  input: {
+    body?: EndpointReceiptsCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointReceiptsCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointReceiptsCreate_InputBody {
+  bill_to?: string;
+  payment_method?: string;
+  payment_terms?: string;
+  reference_number?: string;
+  status: "draft" | "issued" | "cancelled";
+  shipping_address?: string;
+  tax_type?: "rate" | "fixed";
+  tax_amount?: number;
+  discount_type?: "rate" | "fixed";
+  discount_amount?: number;
+  shipping_amount?: number;
+  amount_paid?: number;
+  date: string;
+  items?: {
+    id?: string;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+}
+export interface EndpointReceiptsCreate_OutputCREATED {
+  id: string;
+  receipt_number: string;
+  bill_to: string | null;
+  date: string;
+  payment_method: string;
+  payment_terms: string;
+  reference_number: string;
+  status: "draft" | "issued" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  created: string;
+  updated: string;
+}
+export interface EndpointReceiptsDuplicate {
+  method: "post";
+  input: {
+    query?: EndpointReceiptsDuplicate_InputQuery;
+  };
+  output: {
+    CREATED: EndpointReceiptsDuplicate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointReceiptsDuplicate_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptsGetById {
+  method: "get";
+  input: {
+    query?: EndpointReceiptsGetById_InputQuery;
+  };
+  output: {
+    OK: EndpointReceiptsGetById_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptsGetById_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptsGetById_OutputOK {
+  id: string;
+  receipt_number: string;
+  bill_to: string | null;
+  date: string;
+  payment_method: string;
+  payment_terms: string;
+  reference_number: string;
+  status: "draft" | "issued" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  created: string;
+  updated: string;
+  items: {
+    id: string;
+    receipt: string | null;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+  expand?: {
+    bill_to?: {
+      id: string;
+      name: string;
+      address: string;
+      email: string;
+      phone: string;
+      created: string;
+      updated: string;
+    };
+  };
+}
+export interface EndpointReceiptsList {
+  method: "get";
+  input: {
+    query?: EndpointReceiptsList_InputQuery;
+  };
+  output: {
+    OK: EndpointReceiptsList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptsList_InputQuery {
+  status?: "draft" | "issued" | "cancelled";
+  clientId?: string;
+  search?: string;
+}
+export interface EndpointReceiptsRemove {
+  method: "post";
+  input: {
+    query?: EndpointReceiptsRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointReceiptsRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointReceiptsRemove_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptsUpdate {
+  method: "post";
+  input: {
+    query?: EndpointReceiptsUpdate_InputQuery;
+    body?: EndpointReceiptsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointReceiptsUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptsUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptsUpdate_InputBody {
+  bill_to?: string;
+  payment_method?: string;
+  payment_terms?: string;
+  reference_number?: string;
+  status?: "draft" | "issued" | "cancelled";
+  shipping_address?: string;
+  tax_type?: "rate" | "fixed";
+  tax_amount?: number;
+  discount_type?: "rate" | "fixed";
+  discount_amount?: number;
+  shipping_amount?: number;
+  amount_paid?: number;
+  receipt_number?: string;
+  date?: string;
+  items?: {
+    id?: string;
+    description: string;
+    quantity: number;
+    rate: number;
+    order: number;
+  }[];
+}
+export interface EndpointReceiptsUpdate_OutputOK {
+  id: string;
+  receipt_number: string;
+  bill_to: string | null;
+  date: string;
+  payment_method: string;
+  payment_terms: string;
+  reference_number: string;
+  status: "draft" | "issued" | "cancelled";
+  shipping_address: string;
+  tax_type: "rate" | "fixed" | "";
+  tax_amount: number;
+  discount_type: "rate" | "fixed" | "";
+  discount_amount: number;
+  shipping_amount: number;
+  amount_paid: number;
+  created: string;
+  updated: string;
+}
+export interface EndpointReceiptItemsCreate {
+  method: "post";
+  input: {
+    body?: EndpointReceiptItemsCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointReceiptItemsCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointReceiptItemsCreate_InputBody {
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+  receipt: string;
+}
+export interface EndpointReceiptItemsCreate_OutputCREATED {
+  id: string;
+  receipt: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}
+export interface EndpointReceiptItemsListByReceipt {
+  method: "get";
+  input: {
+    query?: EndpointReceiptItemsListByReceipt_InputQuery;
+  };
+  output: {
+    OK: EndpointReceiptItemsListByReceipt_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptItemsListByReceipt_InputQuery {
+  receiptId: string;
+}
+export interface EndpointReceiptItemsRemove {
+  method: "post";
+  input: {
+    query?: EndpointReceiptItemsRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointReceiptItemsRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointReceiptItemsRemove_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptItemsReorder {
+  method: "post";
+  input: {
+    body?: EndpointReceiptItemsReorder_InputBody;
+  };
+  output: {
+    OK: EndpointReceiptItemsReorder_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptItemsReorder_InputBody {
+  receiptId: string;
+  itemIds: string[];
+}
+export interface EndpointReceiptItemsReorder_OutputOK {
+  success: boolean;
+}
+export interface EndpointReceiptItemsUpdate {
+  method: "post";
+  input: {
+    query?: EndpointReceiptItemsUpdate_InputQuery;
+    body?: EndpointReceiptItemsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointReceiptItemsUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointReceiptItemsUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointReceiptItemsUpdate_InputBody {
+  description?: string;
+  quantity?: number;
+  rate?: number;
+  order?: number;
+}
+export interface EndpointReceiptItemsUpdate_OutputOK {
+  id: string;
+  receipt: string | null;
+  description: string;
+  quantity: number;
+  rate: number;
+  order: number;
+}
+export interface EndpointClientsCreate {
+  method: "post";
+  input: {
+    body?: EndpointClientsCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointClientsCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointClientsCreate_InputBody {
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+}
+export interface EndpointClientsCreate_OutputCREATED {
+  id: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  created: string;
+  updated: string;
+}
+export interface EndpointClientsGetById {
+  method: "get";
+  input: {
+    query?: EndpointClientsGetById_InputQuery;
+  };
+  output: {
+    OK: EndpointClientsGetById_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointClientsGetById_InputQuery {
+  id: string;
+}
+export interface EndpointClientsGetById_OutputOK {
+  id: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  created: string;
+  updated: string;
+}
+export interface EndpointClientsList {
+  method: "get";
+  input: {};
+  output: {
+    OK: EndpointClientsList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointClientsRemove {
+  method: "post";
+  input: {
+    query?: EndpointClientsRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointClientsRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointClientsRemove_InputQuery {
+  id: string;
+}
+export interface EndpointClientsUpdate {
+  method: "post";
+  input: {
+    query?: EndpointClientsUpdate_InputQuery;
+    body?: EndpointClientsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointClientsUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointClientsUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointClientsUpdate_InputBody {
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+}
+export interface EndpointClientsUpdate_OutputOK {
+  id: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  created: string;
+  updated: string;
+}
+export interface EndpointSettingsGet {
+  method: "get";
+  input: {};
+  output: {
+    OK: EndpointSettingsGet_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointSettingsGet_OutputOK {
+  id: string;
+  company_name: string;
+  company_address: string;
+  company_reg_no: string;
+  company_email: string;
+  company_tel_no: string;
+  default_logo: string;
+  default_payment_terms: string;
+  default_notes: string;
+  default_tax_rate: number;
+  bank_name: string;
+  bank_account: string;
+  bank_account_name: string;
+  currency: string;
+  currency_symbol: string;
+  invoice_prefix: string;
+  next_invoice_number: number;
+  receipt_prefix: string;
+  next_receipt_number: number;
+  created: string;
+  updated: string;
+}
+export interface EndpointSettingsUpdate {
+  method: "post";
+  input: {
+    body?: EndpointSettingsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointSettingsUpdate_OutputOK;
+  };
+  media: {default_logo: {optional: true}};
+}
+export interface EndpointSettingsUpdate_InputBody {
+  company_name?: string;
+  company_address?: string;
+  company_reg_no?: string;
+  company_email?: string;
+  company_tel_no?: string;
+  default_payment_terms?: string;
+  default_notes?: string;
+  default_tax_rate?: number;
+  bank_name?: string;
+  bank_account?: string;
+  bank_account_name?: string;
+  currency?: string;
+  currency_symbol?: string;
+  invoice_prefix?: string;
+  next_invoice_number?: number;
+  receipt_prefix?: string;
+  next_receipt_number?: number;
+}
+export interface EndpointSettingsUpdate_OutputOK {
+  id: string;
+  company_name: string;
+  company_address: string;
+  company_reg_no: string;
+  company_email: string;
+  company_tel_no: string;
+  default_logo: string;
+  default_payment_terms: string;
+  default_notes: string;
+  default_tax_rate: number;
+  bank_name: string;
+  bank_account: string;
+  bank_account_name: string;
+  currency: string;
+  currency_symbol: string;
+  invoice_prefix: string;
+  next_invoice_number: number;
+  receipt_prefix: string;
+  next_receipt_number: number;
+  created: string;
+  updated: string;
+}

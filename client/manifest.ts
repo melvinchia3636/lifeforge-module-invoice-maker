@@ -2,9 +2,9 @@ import { lazy } from 'react'
 
 import { createForgeModule } from '@lifeforge/federation'
 
-import contract from './contract'
+import type { Contract } from './contract'
 
-const { forgeAPI, ...manifest } = createForgeModule({
+const { forgeAPI, ...manifest } = createForgeModule<Contract>({
   subsection: [
     { label: 'Invoices', icon: 'tabler:file-invoice', path: 'invoice' },
     { label: 'Receipts', icon: 'tabler:receipt', path: 'receipt' },
@@ -21,8 +21,7 @@ const { forgeAPI, ...manifest } = createForgeModule({
     '/receipt/modify': lazy(() => import('@/pages/ModifyReceipt')),
     '/receipt/modify/:id': lazy(() => import('@/pages/ModifyReceipt')),
     '/client': lazy(() => import('@/pages/Clients'))
-  },
-  contract
+  }
 })
 
 export default manifest
