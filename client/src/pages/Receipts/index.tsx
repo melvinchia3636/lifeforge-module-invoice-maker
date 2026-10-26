@@ -50,8 +50,8 @@ export default function ReceiptsPage() {
           }
 
           return (
-            <Scrollbar>
-              <Stack pb="lg">
+            <Scrollbar pb={{ base: 'lg', md: 'none' }}>
+              <Stack>
                 {data.map(receipt => (
                   <DocCard
                     key={receipt.id}

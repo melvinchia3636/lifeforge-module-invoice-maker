@@ -46,8 +46,8 @@ export default function InvoiceMaker() {
           }
 
           return (
-            <Scrollbar>
-              <Stack pb="lg">
+            <Scrollbar pb={{ base: 'lg', md: 'none' }}>
+              <Stack>
                 {data.map(invoice => (
                   <DocCard
                     key={invoice.id}
