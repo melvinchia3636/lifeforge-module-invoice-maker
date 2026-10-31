@@ -13,7 +13,8 @@ import ReceiptTotalsAndNotesForm from './sections/ReceiptTotalsAndNotesForm'
 
 function ModifyReceiptContent() {
   const navigate = useNavigate()
-  const {
+  
+const {
     isEditMode,
     handleSubmit,
     isLoading,

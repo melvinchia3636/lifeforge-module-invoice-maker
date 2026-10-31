@@ -89,11 +89,13 @@ const Context = createContext<ReceiptEditorContext | null>(null)
 
 export function useReceiptEditor() {
   const ctx = useContext(Context)
+
   if (!ctx) {
     throw new Error(
       'useReceiptEditor must be used within a ReceiptEditorProvider'
     )
   }
+
   return ctx
 }
 
@@ -113,9 +115,9 @@ export default function ReceiptEditorProvider({
   const [showDiscount, setShowDiscount] = useState(false)
   const [showTax, setShowTax] = useState(false)
   const [showShipping, setShowShipping] = useState(false)
-
   const [searchParams] = useSearchParams()
-  const fromInvoiceId = searchParams.get('fromInvoice')
+  
+const fromInvoiceId = searchParams.get('fromInvoice')
 
   const receiptQuery = useQuery(
     forgeAPI.receipts.getById
@@ -221,6 +223,7 @@ export default function ReceiptEditorProvider({
       )
 
       let taxAmount = 0
+
       if (inv.tax_type === 'rate') {
         taxAmount = (subtotal * (inv.tax_amount || 0)) / 100
       } else if (inv.tax_type === 'fixed') {
@@ -228,6 +231,7 @@ export default function ReceiptEditorProvider({
       }
 
       let discountAmount = 0
+
       if (inv.discount_type === 'rate') {
         discountAmount = (subtotal * (inv.discount_amount || 0)) / 100
       } else if (inv.discount_type === 'fixed') {
@@ -322,22 +326,27 @@ export default function ReceiptEditorProvider({
   const handleSubmit = async () => {
     if (!formData.bill_to) {
       toast.error(t('toast.clientRequired', 'Client is required'))
+
       return
     }
 
     if (!formData.date) {
       toast.error(t('toast.dateRequired', 'Date is required'))
+
       return
     }
 
     if (!formData.payment_method) {
       toast.error(t('toast.paymentMethodRequired', 'Payment method is required'))
+
       return
     }
 
     const items = formData.items.filter(item => item.description.trim() !== '')
+
     if (items.length === 0) {
       toast.error(t('toast.itemsRequired', 'At least one line item is required'))
+
       return
     }
 
@@ -372,6 +381,7 @@ export default function ReceiptEditorProvider({
     )
 
     let discountAmount = 0
+
     if (formData.discount_type === 'rate') {
       discountAmount = (subtotal * formData.discount_amount) / 100
     } else if (formData.discount_type === 'fixed') {
@@ -379,6 +389,7 @@ export default function ReceiptEditorProvider({
     }
 
     let taxAmount = 0
+
     if (formData.tax_type === 'rate') {
       taxAmount = (subtotal * formData.tax_amount) / 100
     } else if (formData.tax_type === 'fixed') {

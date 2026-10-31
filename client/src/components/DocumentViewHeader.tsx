@@ -53,7 +53,7 @@ export default function DocumentViewHeader({
 
   const isInvoice = 'invoice_number' in data
   const documentType = isInvoice ? 'invoice' : 'receipt'
-  const documentNumber = isInvoice ? (data as Invoice).invoice_number : (data as Receipt).receipt_number
+  const documentNumber = isInvoice ? (data).invoice_number : (data).receipt_number
 
   const statusConfig = isInvoice
     ? INVOICE_STATUS_CONFIG[(data.status as keyof typeof INVOICE_STATUS_CONFIG) || 'draft']

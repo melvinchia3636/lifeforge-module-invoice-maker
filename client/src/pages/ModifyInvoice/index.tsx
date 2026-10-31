@@ -14,7 +14,8 @@ import TotalSection from './sections/TotalSection'
 
 function ModifyInvoiceContent() {
   const navigate = useNavigate()
-  const {
+  
+const {
     isEditMode,
     handleSubmit,
     isLoading,

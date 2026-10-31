@@ -237,22 +237,27 @@ function InvoiceEditorProvider({ children }: { children: React.ReactNode }) {
   const handleSubmit = async () => {
     if (!formData.bill_to) {
       toast.error(t('toast.clientRequired', 'Client is required'))
+
       return
     }
 
     if (!formData.date) {
       toast.error(t('toast.dateRequired', 'Date is required'))
+
       return
     }
 
     if (!formData.due_date) {
       toast.error(t('toast.dueDateRequired', 'Due date is required'))
+
       return
     }
 
     const items = formData.items.filter(item => item.description.trim() !== '')
+
     if (items.length === 0) {
       toast.error(t('toast.itemsRequired', 'At least one line item is required'))
+
       return
     }
 

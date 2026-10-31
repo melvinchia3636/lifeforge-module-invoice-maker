@@ -68,7 +68,7 @@ function ClientItem({ client }: { client: Client }) {
           <Icon color="muted" icon="tabler:user" size="1.75em" />
         </Flex>
         <Box minWidth="0" width="100%">
-          <Text as="h4" truncate weight="medium">
+          <Text truncate as="h4" weight="medium">
             {client.name}
           </Text>
           {(client.email || client.phone) && (

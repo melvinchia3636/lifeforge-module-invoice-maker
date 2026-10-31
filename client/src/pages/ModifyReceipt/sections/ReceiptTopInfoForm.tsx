@@ -37,7 +37,8 @@ function ReceiptTopInfoForm() {
   const clientsQuery = useQuery(forgeAPI.clients.list.queryOptions())
 
   const clients = clientsQuery.data || []
-  const { formData, updateField } = useReceiptEditor()
+  
+const { formData, updateField } = useReceiptEditor()
 
   return (
     <Card>
